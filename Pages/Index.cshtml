@@ -1,0 +1,239 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<div class="text-center">
+    <h1 class="display-4">Hoş Geldiniz</h1>
+    
+    <p><a asp-page="/Index">Üretim Operasyon Bildirimleri</a>.</p>
+</div>
+
+
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">İş No</th>
+      <th scope="col">Başlangıç</th>
+      <th scope="col">Bitiş</th>
+      <th scope="col">Toplam Süre</th>
+      <th scope="col">Statü</th>
+      <th scope="col">Duruş Nededi</th>
+    </tr>
+  </thead>
+  <tbody>
+      @{
+            int sayac=1,i=0,j=0;
+            TimeSpan toplamsure,baslangicZamani,bitisZamani;
+            int no;
+            string baslangic,bitis,bildirimdurusnedeni;
+            while(j<Model.bildirims.Count){
+                    no=Model.bildirims[j].IsNo;
+                    baslangic=Model.bildirims[j].Baslangic.ToShortTimeString();
+                    bitis=Model.bildirims[j].Bitis.ToShortTimeString();
+                    bildirimdurusnedeni=Model.bildirims[j].DurusNedeni;
+
+                    DateTime BildirimBaslangic=Convert.ToDateTime(baslangic);
+                    DateTime BildirimBitis=Convert.ToDateTime(bitis);
+                
+                    DateTime DurusBaslangic=Convert.ToDateTime(Model.duruslars[i].Baslangic.ToShortTimeString());
+                    DateTime DurusBitis=Convert.ToDateTime(Model.duruslars[i].Bitis.ToShortTimeString());
+                    string durusnedeni=Model.duruslars[i].DurusNededi;
+
+                    if(Model.kontrol(BildirimBaslangic,DurusBaslangic)==0&&Model.kontrol(BildirimBitis,DurusBitis)==0){
+                        //|--------------------|    üretim
+                        //|--------------------|    duruş
+                        <tr>
+                            <th scope="row">if 1</th>
+                            <td>@no</td>
+                            <td>@BildirimBaslangic</td>
+                            <td>@BildirimBitis</td>
+                            <td>@Model.fark(BildirimBitis,BildirimBaslangic)</td>
+                            <td>Duruş</td>
+                            <td>@durusnedeni</td>
+                        </tr>
+                        i++;
+                        j++;
+                    }
+                    else if(Model.kontrol(BildirimBaslangic,DurusBaslangic)==0&&Model.kontrol(DurusBitis,BildirimBitis)<0){
+                        //|-----------------------------|   üretim
+                        //|------------|                    duruş
+                        <tr>
+                            <th scope="row">if 2</th>
+                            <td>@no</td>
+                            <td>@BildirimBaslangic</td>
+                            <td>@DurusBitis</td>
+                            <td>@Model.fark(DurusBitis,DurusBaslangic)</td>
+                            <td>Duruş</td>
+                            <td>@durusnedeni</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">if 2</th>
+                            <td>@no</td>
+                            <td>@DurusBitis</td>
+                            <td>@BildirimBitis</td>
+                            <td>@Model.fark(BildirimBitis,DurusBitis)</td>
+                            <td>Üretim</td>
+                            <td></td>
+                        </tr>
+                        i++;
+                        j++;
+                    }
+                    else if(Model.kontrol(BildirimBitis,DurusBitis)==0&&Model.kontrol(BildirimBaslangic,DurusBaslangic)<0){
+                        //|-----------------------|     üretim
+                        //          |-------------|     duruş
+                        <tr>
+                            <th scope="row">if 3</th>
+                            <td>@no</td>
+                            <td>@baslangic</td>
+                            <td>@DurusBaslangic</td>
+                            <td>@Model.fark(DurusBaslangic,BildirimBaslangic)</td>
+                            <td>Üretim</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">if 3</th>
+                            <td>@no</td>
+                            <td>@DurusBaslangic</td>
+                            <td>@DurusBitis</td>
+                            <td>@Model.fark(DurusBitis,DurusBaslangic)</td>
+                            <td>Duruş</td>
+                            <td>@durusnedeni</td>
+                        </tr>
+                        i++;
+                        j++;
+                    }
+                    else if(Model.kontrol(BildirimBaslangic,DurusBaslangic)<0&&Model.kontrol(DurusBitis,BildirimBitis)<0){
+                        //|----------------------------------|      üretim
+                        //         |-------------|                  duruş
+                        <tr>
+                            <th scope="row">if 4</th>
+                            <td>@no</td>
+                            <td>@BildirimBaslangic</td>
+                            <td>@DurusBaslangic</td>
+                            <td>@Model.fark(DurusBaslangic,BildirimBaslangic)</td>
+                            <td>Üretim</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">if 4</th>
+                            <td>@no</td>
+                            <td>@DurusBaslangic</td>
+                            <td>@DurusBitis</td>
+                            <td>@Model.fark(DurusBitis,DurusBaslangic)</td>
+                            <td>Duruş</td>
+                            <td>@durusnedeni</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">if 4</th>
+                            <td>@no</td>
+                            <td>@DurusBitis</td>
+                            <td>@BildirimBitis</td>
+                            <td>@Model.fark(BildirimBitis,DurusBitis)</td>
+                            <td>Üretim</td>
+                            <td></td>
+                        </tr>
+                        i++;
+                        j++;
+                    }
+                    else{
+                        //|----------------------------|    üretim 
+                        // ----------------------------     duruş
+                        <tr>
+                            <th scope="row">if 5</th>
+                            <td>@no</td>
+                            <td>@BildirimBaslangic</td>
+                            <td>@BildirimBitis</td>
+                            <td>@Model.fark(BildirimBitis,BildirimBaslangic)</td>
+                            <td>@(Model.nedenVarmi(bildirimdurusnedeni)?"Duruş":"Üretim")</td>
+                            <td>@(Model.nedenVarmi(bildirimdurusnedeni)?bildirimdurusnedeni:"")</td>
+                        </tr>
+                        
+                        j++;
+                        
+                    }
+                
+            }
+        }
+      
+    
+  </tbody>
+</table>
+
+
+<hr/>
+
+
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">İş No</th>
+      <th scope="col">Başlangıç</th>
+      <th scope="col">Bitiş</th>
+      <th scope="col">Toplam Süre</th>
+      <th scope="col">Statü</th>
+      <th scope="col">Duruş Nededi</th>
+    </tr>
+  </thead>
+  <tbody>
+      @{
+        sayac=1;
+      @foreach(var item in Model.bildirims){
+          //bildirims adı index.cs deki bildirimden geliyor
+          DateTime onceki=Convert.ToDateTime(item.Baslangic);
+          DateTime sonraki=Convert.ToDateTime(item.Bitis);
+          <tr>
+            
+            <th scope="row">@sayac</th>
+            <td>@item.IsNo</td>
+            <td>@item.Baslangic</td>
+            <td>@item.Bitis</td>
+            <td>@(sonraki-onceki)</td>
+            <td>@item.Statu</td>
+            <td>@item.DurusNedeni</td>
+        </tr>
+        sayac++;
+      }
+      }
+    
+    
+  </tbody>
+</table>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Duruş No</th>
+      <th scope="col">Başlangıç</th>
+      <th scope="col">Bitiş</th>
+      <th scope="col">Duruş Nededi</th>
+    </tr>
+  </thead>
+  <tbody>
+      @{
+        sayac=1;
+      @foreach(var item in Model.duruslars){
+          //bildirims adı index.cs deki bildirimden geliyor
+          
+          <tr>
+            
+            <th scope="row">@sayac</th>
+            <td>@item.DurusId</td>
+            <td>@item.Baslangic.ToShortTimeString()</td>
+            <td>@item.Bitis.ToShortTimeString()</td>
+            <td>@item.DurusNededi</td>
+        </tr>
+        sayac++;
+      }
+      }
+    
+    
+  </tbody>
+</table>
+
